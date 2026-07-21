@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Base de Datos de Servicio de Streaming — UEES</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<style>
+  :root{
+    --maroon:#711130;
+    --maroon-light:#9a1c44;
+    --maroon-glow: rgba(113,17,48,0.55);
+    --bg:#0a0a0a;
+    --surface:#141414;
+    --surface-2:#1c1c1c;
+    --border:#2a2a2a;
+    --white:#f5f5f5;
+    --gray:#9a9a9a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    overflow:hidden;
+  }
+  ::selection{ background:var(--maroon); color:#fff; }
+
+  /* ---------- Barra de progreso ---------- */
+  #progress{
+    position:fixed; top:0; left:0; height:3px; background:var(--maroon);
+    width:0%; z-index:100; transition:width .5s cubic-bezier(.65,0,.35,1);
+    box-shadow: 0 0 10px var(--maroon-glow);
+  }
+
+  /* ---------- Encabezado fijo ---------- */
+  #topbar{
+    position:fixed; top:0; left:0; right:0; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 28px; z-index:90; pointer-events:none;
+  }
+  #topbar .brand{ display:flex; align-items:center; gap:10px; font-size:.8rem; color:var(--gray); letter-spacing:.08em; text-transform:uppercase; }
+  #topbar .brand i{ color:var(--maroon); }
+  #topbar .counter{ font-size:.8rem; color:var(--gray); letter-spacing:.05em; }
+  #topbar .counter b{ color:var(--white); }
+
+  /* ---------- Slides ---------- */
+  .deck{ position:relative; width:100vw; height:100vh; }
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 90px 8vw 70px;
+    opacity:0; visibility:hidden;
+    transform: translateY(24px) scale(.98);
+    transition: opacity .55s cubic-bezier(.65,0,.35,1), transform .55s cubic-bezier(.65,0,.35,1), visibility .55s;
+  }
+  .slide.active{
+    opacity:1; visibility:visible; transform: translateY(0) scale(1);
+    z-index:5;
+  }
+  .slide.exit-left{ transform: translateX(-40px) scale(.98); }
+  .slide.exit-right{ transform: translateX(40px) scale(.98); }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--maroon-light); border:1px solid var(--border); border-radius:999px;
+    padding:6px 14px; margin-bottom:22px;
+  }
+  .eyebrow i{ color:var(--maroon-light); }
+
+  h1.title{
+    font-size:clamp(2.2rem, 5vw, 3.6rem);
+    font-weight:700; line-height:1.05; letter-spacing:-.01em;
+    text-align:center; margin-bottom:18px;
+  }
+  h1.title span{ color:var(--maroon-light); }
+
+  h2.section-title{
+    font-size:clamp(1.6rem, 3.4vw, 2.4rem);
+    font-weight:700; margin-bottom:8px; text-align:center;
+  }
+  .subtitle{ color:var(--gray); text-align:center; max-width:760px; font-size:1rem; line-height:1.6; margin-bottom:10px; }
+
+  .content-wrap{ width:100%; max-width:1080px; display:flex; flex-direction:column; align-items:center; gap:26px; overflow:auto; max-height:72vh; padding-bottom: 10px;}
+  .content-wrap::-webkit-scrollbar{ width:6px; }
+  .content-wrap::-webkit-scrollbar-thumb{ background:var(--border); border-radius:6px; }
+
+  /* ---------- Tarjetas ---------- */
+  .grid{ display:grid; gap:16px; width:100%; }
+  .grid.cols-2{ grid-template-columns:repeat(2,1fr); }
+  .grid.cols-4{ grid-template-columns:repeat(4,1fr); }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:22px; text-align:left; position:relative; overflow:hidden;
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .card:hover{
+    transform: translateY(-4px);
+    border-color: var(--maroon);
+    box-shadow: 0 0 0 1px var(--maroon), 0 0 28px var(--maroon-glow);
+  }
+  .card .icon{
+    width:42px; height:42px; border-radius:10px; background:var(--surface-2);
+    display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+    color:var(--maroon-light); font-size:1.1rem; border:1px solid var(--border);
+    transition: box-shadow .3s ease, color .3s ease;
+  }
+  .card:hover .icon{ box-shadow:0 0 16px var(--maroon-glow); color:#fff; background:var(--maroon); }
+  .card h3{ font-size:1.02rem; margin-bottom:6px; }
+  .card p{ color:var(--gray); font-size:.87rem; line-height:1.55; }
+  .card .tag{
+    position:absolute; top:16px; right:16px; font-size:.65rem; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--maroon-light); border:1px solid var(--border);
+    padding:3px 8px; border-radius:999px;
+  }
+
+  /* ---------- Tabla ---------- */
+  table.rel-table{ width:100%; border-collapse:collapse; font-size:.86rem; }
+  table.rel-table th{
+    text-align:left; background:var(--maroon); color:#fff; padding:10px 12px;
+    font-weight:600; letter-spacing:.02em; font-size:.75rem; text-transform:uppercase;
+  }
+  table.rel-table th:first-child{ border-top-left-radius:8px; }
+  table.rel-table th:last-child{ border-top-right-radius:8px; }
+  table.rel-table td{ padding:10px 12px; border-bottom:1px solid var(--border); color:var(--white); }
+  table.rel-table tr:nth-child(even) td{ background:var(--surface); }
+  table.rel-table td.mono{ font-family: "Consolas", monospace; color:var(--maroon-light); }
+  table.rel-table td.muted{ color:var(--gray); }
+
+  /* ---------- Código ---------- */
+  .code-block{
+    width:100%; background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden; text-align:left;
+  }
+  .code-block .code-head{
+    display:flex; align-items:center; gap:8px; padding:10px 16px;
+    border-bottom:1px solid var(--border); background:var(--surface-2);
+    font-size:.72rem; color:var(--gray); letter-spacing:.04em;
+  }
+  .code-block .code-head i{ color:var(--maroon-light); }
+  .code-block pre{
+    padding:16px 18px; font-size:.8rem; line-height:1.65; overflow-x:auto;
+    font-family:"Consolas","Courier New",monospace; color:#e7e7e7;
+  }
+  .code-block .kw{ color:var(--maroon-light); }
+  .code-block .cm{ color:var(--gray); font-style:italic; }
+
+  /* ---------- Timeline (fases) ---------- */
+  .timeline{ display:flex; width:100%; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .timeline .step{
+    flex:1; min-width:130px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:16px 14px; text-align:center; position:relative;
+    transition: border-color .3s, box-shadow .3s, transform .3s;
+  }
+  .timeline .step:hover{ border-color:var(--maroon); box-shadow:0 0 22px var(--maroon-glow); transform:translateY(-3px); }
+  .timeline .step .num{
+    width:26px; height:26px; border-radius:50%; background:var(--maroon); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700;
+    margin:0 auto 10px;
+  }
+  .timeline .step p{ font-size:.78rem; color:var(--gray); }
+
+  /* ---------- Portada ---------- */
+  .cover-icon{
+    width:86px; height:86px; border-radius:22px; background:var(--surface);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    font-size:2.1rem; color:var(--maroon-light); margin-bottom:30px;
+    box-shadow:0 0 40px var(--maroon-glow);
+    animation: floatY 4s ease-in-out infinite;
+  }
+  @keyframes floatY{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+
+  .team{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:26px; }
+  .team .member{
+    display:flex; align-items:center; gap:8px; background:var(--surface);
+    border:1px solid var(--border); padding:8px 16px; border-radius:999px; font-size:.82rem;
+    transition: box-shadow .3s, border-color .3s;
+  }
+  .team .member:hover{ border-color:var(--maroon); box-shadow:0 0 18px var(--maroon-glow); }
+  .team .member i{ color:var(--maroon-light); font-size:.75rem; }
+
+  .meta-row{ display:flex; gap:22px; margin-top:20px; color:var(--gray); font-size:.82rem; flex-wrap:wrap; justify-content:center; }
+  .meta-row span{ display:flex; align-items:center; gap:6px; }
+  .meta-row i{ color:var(--maroon-light); }
+
+  /* ---------- Cierre ---------- */
+  .thanks-icon{
+    font-size:3.2rem; color:var(--maroon-light); margin-bottom:20px;
+    text-shadow:0 0 40px var(--maroon-glow);
+  }
+
+  /* ---------- Navegación ---------- */
+  #nav-arrows{
+    position:fixed; bottom:26px; right:28px; display:flex; gap:10px; z-index:90;
+  }
+  .nav-btn{
+    width:46px; height:46px; border-radius:50%; background:var(--surface);
+    border:1px solid var(--border); color:var(--white); font-size:1rem;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition: border-color .25s, box-shadow .25s, transform .25s, background .25s;
+  }
+  .nav-btn:hover{ border-color:var(--maroon); box-shadow:0 0 22px var(--maroon-glow); background:var(--maroon); transform:translateY(-2px); }
+  .nav-btn:active{ transform:translateY(0); }
+  .nav-btn.disabled{ opacity:.3; pointer-events:none; }
+
+  #dots{
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
+    display:flex; gap:9px; z-index:90;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%; background:var(--border); cursor:pointer;
+    transition: background .3s, box-shadow .3s, width .3s;
+  }
+  .dot:hover{ background:var(--maroon-light); }
+  .dot.active{ background:var(--maroon); width:26px; border-radius:5px; box-shadow:0 0 14px var(--maroon-glow); }
+
+  #hint{
+    position:fixed; bottom:26px; left:28px; z-index:90; color:var(--gray);
+    font-size:.72rem; display:flex; align-items:center; gap:8px; letter-spacing:.03em;
+    opacity:.75;
+  }
+  #hint kbd{
+    border:1px solid var(--border); border-radius:4px; padding:1px 6px; font-size:.68rem; color:var(--white);
+  }
+
+  @media (max-width: 760px){
+    .grid.cols-2, .grid.cols-4{ grid-template-columns:1fr 1fr; }
+    #hint{ display:none; }
+    .slide{ padding: 80px 6vw 90px; }
+  }
+  @media (max-width: 480px){
+    .grid.cols-2, .grid.cols-4{ grid-template-columns:1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="progress"></div>
+
+  <div id="topbar">
+    <div class="brand"><i class="fa-solid fa-database"></i> UEES · Base de Datos I</div>
+    <div class="counter"><b id="slide-current">1</b> / <span id="slide-total">1</span></div>
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- 1. PORTADA -->
+    <section class="slide active" data-title="Portada">
+      <div class="cover-icon"><i class="fa-solid fa-clapperboard"></i></div>
+      <div class="eyebrow"><i class="fa-solid fa-graduation-cap"></i> Proyecto Final · Julio 2026</div>
+      <h1 class="title">Base de Datos de<br><span>Servicio de Streaming</span></h1>
+      <p class="subtitle">Diseño relacional de una plataforma de video bajo demanda: catálogo audiovisual jerárquico y consumo transaccional de usuarios, en el contexto ecuatoriano.</p>
+      <div class="team">
+        <div class="member"><i class="fa-solid fa-user"></i> Jim Alejandro Vargas Bravo</div>
+        <div class="member"><i class="fa-solid fa-user"></i> Matías Fernando Yépez Santelices</div>
+        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
+      </div>
+      <div class="meta-row">
+        <span><i class="fa-solid fa-chalkboard-user"></i> Docente: Paul Francisco Baldeón Egas</span>
+        <span><i class="fa-solid fa-calendar"></i> Julio 2026</span>
+      </div>
+    </section>
+
+    <!-- 2. IDEA DEL PROYECTO -->
+    <section class="slide" data-title="Idea del proyecto">
+      <div class="eyebrow"><i class="fa-solid fa-lightbulb"></i> 01 · Idea del proyecto</div>
+      <h2 class="section-title">Dos naturalezas de datos, un mismo sistema</h2>
+      <p class="subtitle">Alcance acotado al contexto ecuatoriano (usuarios, ciudades, provincias) para mantener el modelo manejable sin perder complejidad relacional real.</p>
+      <div class="content-wrap">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-film"></i></div>
+            <span class="tag">Catálogo</span>
+            <h3>Información de catálogo</h3>
+            <p>Películas, series, temporadas, capítulos y reparto — del tipo que normalmente se extrae de fuentes externas (APIs de cine, bases públicas audiovisuales).</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-credit-card"></i></div>
+            <span class="tag">Transaccional</span>
+            <h3>Información transaccional</h3>
+            <p>Usuarios, perfiles, suscripciones e historial de visualización — propia de la operación diaria de un sistema de streaming.</p>
+          </div>
+        </div>
+        <div class="card" style="width:100%;">
+          <div class="icon"><i class="fa-solid fa-bullseye"></i></div>
+          <h3>Caso de uso planteado</h3>
+          <p>Una empresa ecuatoriana licencia contenido audiovisual, lo cataloga en su plataforma y lo ofrece a usuarios registrados mediante planes de suscripción, permitiendo múltiples perfiles por cuenta, seguimiento de progreso de visualización y listas personalizadas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BLOQUES DEL MODELO E/R -->
+    <section class="slide" data-title="Bloques del modelo">
+      <div class="eyebrow"><i class="fa-solid fa-diagram-project"></i> 02 · Modelo Entidad–Relación</div>
+      <h2 class="section-title">Cuatro bloques funcionales</h2>
+      <p class="subtitle">El modelo agrupa las entidades del dominio antes de definir tipos de dato o llaves físicas.</p>
+      <div class="content-wrap">
+        <div class="grid cols-4">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-earth-americas"></i></div>
+            <h3>Geografía</h3>
+            <p>Región → Provincia → Ciudad, cadena jerárquica 1:N usada como ubicación de Persona.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-id-card"></i></div>
+            <h3>Identidad</h3>
+            <p>Persona como entidad base; User y Actor como especializaciones 1:1. User posee Perfil (1:N).</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
+            <h3>Catálogo</h3>
+            <p>Estudio y Productora producen Película/Serie. Categoría clasifica (N:M). Serie → Temporada → Capítulo.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-receipt"></i></div>
+            <h3>Consumo y negocio</h3>
+            <p>User contrata Plan (Suscripción). Perfil visualiza contenido y guarda en MiLista.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. RELACIONES PRINCIPALES -->
+    <section class="slide" data-title="Relaciones principales">
+      <div class="eyebrow"><i class="fa-solid fa-arrows-left-right"></i> 02 · Modelo Entidad–Relación</div>
+      <h2 class="section-title">Relaciones principales</h2>
+      <p class="subtitle">Cardinalidades y notas clave de cada relación identificada en el conceptual.</p>
+      <div class="content-wrap">
+        <table class="rel-table">
+          <thead><tr><th>Relación</th><th>Entidades</th><th>Cardin.</th><th>Nota</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">pertenece_a</td><td>Provincia → Región</td><td>N:1</td><td class="muted">—</td></tr>
+            <tr><td class="mono">pertenece_a</td><td>Ciudad → Provincia</td><td>N:1</td><td class="muted">—</td></tr>
+            <tr><td class="mono">reside_en</td><td>Persona → Ciudad</td><td>N:1</td><td class="muted">—</td></tr>
+            <tr><td class="mono">es_un</td><td>User → Persona</td><td>1:1</td><td class="muted">especialización</td></tr>
+            <tr><td class="mono">es_un</td><td>Actor → Persona</td><td>1:1</td><td class="muted">especialización</td></tr>
+            <tr><td class="mono">posee</td><td>User → Perfil</td><td>1:N</td><td class="muted">—</td></tr>
+            <tr><td class="mono">produce</td><td>Estudio → Película / Serie</td><td>1:N</td><td class="muted">—</td></tr>
+            <tr><td class="mono">produce</td><td>Productora → Película / Capítulo</td><td>1:N</td><td class="muted">—</td></tr>
+            <tr><td class="mono">clasifica</td><td>Categoría ↔ Película / Serie</td><td>N:M</td><td class="muted">—</td></tr>
+            <tr><td class="mono">compuesta_por</td><td>Serie → Temporada → Capítulo</td><td>1:N</td><td class="muted">cadena</td></tr>
+            <tr><td class="mono">participa_en</td><td>Actor ↔ Película / Capítulo</td><td>N:M</td><td class="muted">atributo rol</td></tr>
+            <tr><td class="mono">contrata</td><td>User ↔ Plan</td><td>N:M</td><td class="muted">entidad Suscripción</td></tr>
+            <tr><td class="mono">visualiza</td><td>Perfil ↔ Película / Capítulo</td><td>N:M</td><td class="muted">entidad Visualización</td></tr>
+            <tr><td class="mono">guarda</td><td>Perfil ↔ Película / Serie</td><td>N:M</td><td class="muted">entidad MiLista</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. DECISIONES EXPLÍCITAS -->
+    <section class="slide" data-title="Decisiones explícitas">
+      <div class="eyebrow"><i class="fa-solid fa-scale-balanced"></i> 02 · Modelo Entidad–Relación</div>
+      <h2 class="section-title">Decisiones explícitas del conceptual</h2>
+      <div class="content-wrap">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-building"></i></div>
+            <h3>Empresa y Logs</h3>
+            <p>Se dejaron como entidades administrativas sin relación de negocio directa: Empresa es información institucional y Logs es auditoría transversal a todo el sistema.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h3>Campos de auditoría</h3>
+            <p>Usuario y fecha de creación/modificación no se modelan como entidad ni relación en el E/R conceptual — pertenecen al diseño físico, no al conceptual.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MODELO FÍSICO -->
+    <section class="slide" data-title="Modelo físico">
+      <div class="eyebrow"><i class="fa-solid fa-table-cells"></i> 03 · Modelo físico</div>
+      <h2 class="section-title">Del E/R al esquema relacional</h2>
+      <p class="subtitle">Reglas estándar de mapeo aplicadas para traducir el conceptual a tablas.</p>
+      <div class="content-wrap">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-key"></i></div>
+            <h3>Llaves surrogate</h3>
+            <p>Toda entidad se convirtió en tabla con <span class="mono" style="color:var(--maroon-light)">id SERIAL</span>, en lugar de identificadores conceptuales, simplificando FKs y evitando colisiones de nombre.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-link"></i></div>
+            <h3>Relaciones 1:N</h3>
+            <p>Resueltas con FK en la tabla del lado N. Ej: <span style="color:var(--maroon-light)">provincia.region_id</span>, <span style="color:var(--maroon-light)">pelicula.estudio_id</span>.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-table"></i></div>
+            <h3>Relaciones N:M</h3>
+            <p>Materializadas como tablas puente: <span style="color:var(--maroon-light)">pelicula_categoria</span>, <span style="color:var(--maroon-light)">serie_categoria</span>, <span style="color:var(--maroon-light)">reparto_pelicula</span>, <span style="color:var(--maroon-light)">reparto_capitulo</span>.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-code-branch"></i></div>
+            <h3>Entidades asociativas</h3>
+            <p>Suscripción, Visualización y MiLista ya tenían atributos propios en el E/R — se mapearon directo como tabla, sin puente adicional.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-code-fork"></i></div>
+            <h3>Especialización 1:1</h3>
+            <p>User y Actor como subtipos de Persona se resolvieron con FK única (<span style="color:var(--maroon-light)">persona_id UNIQUE</span>) en lugar de fusionar atributos.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-clipboard-check"></i></div>
+            <h3>Bloque de auditoría</h3>
+            <p>Cada tabla de negocio suma <span style="color:var(--maroon-light)">is_active, created_at, updated_at, created_by, updated_by</span> (FK a user.id).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. NORMALIZACIÓN -->
+    <section class="slide" data-title="Normalización">
+      <div class="eyebrow"><i class="fa-solid fa-check-double"></i> 04 · Normalización</div>
+      <h2 class="section-title">Cumplimiento de formas normales</h2>
+      <div class="content-wrap">
+        <table class="rel-table">
+          <thead><tr><th>Forma</th><th>Verificación</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">1FN</td><td>Todos los atributos son atómicos; no hay grupos repetitivos ni columnas multivaluadas.</td></tr>
+            <tr><td class="mono">2FN</td><td>Llaves surrogate en todas las tablas evitan dependencias parciales. En claves naturales compuestas (temporada, capítulo, reparto_pelicula, reparto_capitulo) los atributos dependen de la combinación completa que forma el UNIQUE.</td></tr>
+            <tr><td class="mono">3FN</td><td>Sin dependencias transitivas: la cadena geográfica no duplica región en ciudad; Persona/User/Actor evita repetir nombre, cédula o email; las tablas puente no agregan atributos derivados.</td></tr>
+          </tbody>
+        </table>
+        <div class="grid cols-2" style="margin-top:4px;">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-shuffle"></i></div>
+            <h3>Patrón polimórfico</h3>
+            <p>FKs nulleables + CHECK en visualización/mi_lista priorizan simplicidad sobre una tabla supertipo "contenido", a costa de no poder indexar un único campo de referencia.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-bolt"></i></div>
+            <h3>Dato derivable almacenado</h3>
+            <p><span style="color:var(--maroon-light)">suscripcion.estado</span> es derivable de fecha_vencimiento; se guarda por performance, asumiendo sincronización externa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. RUPTURA DEPENDENCIA CIRCULAR -->
+    <section class="slide" data-title="Dependencia circular">
+      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <h2 class="section-title">Ruptura de la dependencia circular</h2>
+      <p class="subtitle"><span class="mono" style="color:var(--maroon-light)">persona.created_by</span> referencia <span class="mono" style="color:var(--maroon-light)">user.id</span>, pero <span class="mono" style="color:var(--maroon-light)">user.persona_id</span> referencia <span class="mono" style="color:var(--maroon-light)">persona.id</span>.</p>
+      <div class="content-wrap">
+        <div class="code-block">
+          <div class="code-head"><i class="fa-solid fa-file-code"></i> ddl_persona_user.sql</div>
+          <pre><span class="kw">CREATE TABLE</span> persona (
+  id SERIAL <span class="kw">PRIMARY KEY</span>,
+  nombres VARCHAR(100) <span class="kw">NOT NULL</span>,
+  ...
+  created_by INT,
+  updated_by INT
+);
+
+<span class="kw">CREATE TABLE</span> "user" (
+  id SERIAL <span class="kw">PRIMARY KEY</span>,
+  persona_id INT <span class="kw">NOT NULL UNIQUE REFERENCES</span> persona(id),
+  username VARCHAR(50) <span class="kw">NOT NULL UNIQUE</span>,
+  password VARCHAR(255) <span class="kw">NOT NULL</span>,
+  ...
+  created_by INT <span class="kw">REFERENCES</span> "user"(id),
+  updated_by INT <span class="kw">REFERENCES</span> "user"(id)
+);
+
+<span class="cm">-- Se cierran las FKs de auditoría diferidas en persona</span>
+<span class="kw">ALTER TABLE</span> persona <span class="kw">ADD CONSTRAINT</span> fk_persona_created_by
+  <span class="kw">FOREIGN KEY</span> (created_by) <span class="kw">REFERENCES</span> "user"(id);
+<span class="kw">ALTER TABLE</span> persona <span class="kw">ADD CONSTRAINT</span> fk_persona_updated_by
+  <span class="kw">FOREIGN KEY</span> (updated_by) <span class="kw">REFERENCES</span> "user"(id);</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. CHECK POLIMÓRFICO -->
+    <section class="slide" data-title="CHECK polimórfico">
+      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <h2 class="section-title">Patrón polimórfico con CHECK</h2>
+      <p class="subtitle">Evita una tabla intermedia genérica de tipo "contenido" para referenciar película o capítulo.</p>
+      <div class="content-wrap">
+        <div class="code-block">
+          <div class="code-head"><i class="fa-solid fa-file-code"></i> ddl_visualizacion.sql</div>
+          <pre><span class="kw">CREATE TABLE</span> visualizacion (
+  id SERIAL <span class="kw">PRIMARY KEY</span>,
+  perfil_id INT <span class="kw">NOT NULL REFERENCES</span> perfil(id),
+  pelicula_id INT <span class="kw">REFERENCES</span> pelicula(id),
+  capitulo_id INT <span class="kw">REFERENCES</span> capitulo(id),
+  progreso DECIMAL(5,2),
+  ...
+  <span class="kw">CHECK</span> (pelicula_id <span class="kw">IS NOT NULL OR</span> capitulo_id <span class="kw">IS NOT NULL</span>)
+);</pre>
+        </div>
+        <div class="timeline">
+          <div class="step"><div class="num">1</div><p>Geografía</p></div>
+          <div class="step"><div class="num">2</div><p>Identidad</p></div>
+          <div class="step"><div class="num">3</div><p>Catálogo</p></div>
+          <div class="step"><div class="num">4</div><p>Negocio</p></div>
+          <div class="step"><div class="num">5</div><p>Consumo</p></div>
+          <div class="step"><div class="num">6</div><p>Logs</p></div>
+        </div>
+        <p class="subtitle" style="margin-top:4px;">Orden de creación por dependencia, con índices sobre FKs de mayor uso esperado en joins, todo dentro de una transacción BEGIN/COMMIT.</p>
+      </div>
+    </section>
+
+    <!-- 10. DATOS Y CONSULTAS DE PRUEBA -->
+    <section class="slide" data-title="Datos y consultas de prueba">
+      <div class="eyebrow"><i class="fa-solid fa-flask"></i> 05 · Creación del script</div>
+      <h2 class="section-title">Datos y consultas de prueba</h2>
+      <div class="content-wrap">
+        <div class="grid cols-2">
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-seedling"></i></div>
+            <h3>Seed de datos</h3>
+            <p>Geografía ecuatoriana, usuarios y perfiles, actores y contenido (películas y series con temporadas/capítulos), reparto, planes y suscripciones —incluyendo un caso vencido—, visualizaciones y listas.</p>
+          </div>
+          <div class="card">
+            <div class="icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+            <h3>12 consultas de prueba</h3>
+            <p>Ejercitan joins multi-tabla, agregaciones, top-N y el patrón COALESCE necesario para las tablas polimórficas.</p>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-head"><i class="fa-solid fa-file-code"></i> contenido_mas_visto.sql</div>
+          <pre><span class="kw">SELECT</span> COALESCE(p.titulo, cap.titulo) <span class="kw">AS</span> contenido,
+       COUNT(*) <span class="kw">AS</span> veces_visto,
+       ROUND(AVG(v.progreso), 2) <span class="kw">AS</span> progreso_promedio
+<span class="kw">FROM</span> visualizacion v
+<span class="kw">LEFT JOIN</span> pelicula p   <span class="kw">ON</span> p.id = v.pelicula_id
+<span class="kw">LEFT JOIN</span> capitulo cap <span class="kw">ON</span> cap.id = v.capitulo_id
+<span class="kw">GROUP BY</span> COALESCE(p.titulo, cap.titulo)
+<span class="kw">ORDER BY</span> veces_visto <span class="kw">DESC</span>;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. CIERRE -->
+    <section class="slide" data-title="Cierre">
+      <div class="thanks-icon"><i class="fa-solid fa-clapperboard"></i></div>
+      <h1 class="title">Gracias por su <span>atención</span></h1>
+      <p class="subtitle">Base de Datos de Servicio de Streaming — UEES, Base de Datos I</p>
+      <div class="team">
+        <div class="member"><i class="fa-solid fa-user"></i> Jim Alejandro Vargas Bravo</div>
+        <div class="member"><i class="fa-solid fa-user"></i> Matías Fernando Yépez Santelices</div>
+        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd> para navegar &nbsp;·&nbsp; <kbd>Espacio</kbd> siguiente</div>
+  <div id="dots"></div>
+  <div id="nav-arrows">
+    <div class="nav-btn" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="nav-btn" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></div>
+  </div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let current = 0;
+
+  document.getElementById('slide-total').textContent = total;
+
+  const dotsContainer = document.getElementById('dots');
+  slides.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(d);
+  });
+  const dots = Array.from(dotsContainer.children);
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('slide-current');
+
+  function render(direction){
+    slides.forEach((s, i) => {
+      s.classList.remove('active','exit-left','exit-right');
+      if (i === current){
+        s.classList.add('active');
+      }
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = current + 1;
+    prevBtn.classList.toggle('disabled', current === 0);
+    nextBtn.classList.toggle('disabled', current === total - 1);
+  }
+
+  function goTo(index){
+    if (index < 0 || index > total - 1 || index === current) return;
+    current = index;
+    render();
+  }
+
+  function next(){ if (current < total - 1) goTo(current + 1); }
+  function prev(){ if (current > 0) goTo(current - 1); }
+
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowRight','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
+    if (['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    if (e.key === 'Home'){ goTo(0); }
+    if (e.key === 'End'){ goTo(total - 1); }
+  });
+
+  // Swipe táctil
+  let touchStartX = 0;
+  window.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; });
+  window.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
