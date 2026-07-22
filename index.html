@@ -66,9 +66,17 @@
     display:inline-flex; align-items:center; gap:8px;
     font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
     color:var(--maroon-light); border:1px solid var(--border); border-radius:999px;
-    padding:6px 14px; margin-bottom:22px;
+    padding:6px 14px; margin-bottom:14px;
   }
   .eyebrow i{ color:var(--maroon-light); }
+
+  .speaker{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:.74rem; color:var(--gray); letter-spacing:.03em;
+    margin-bottom:22px;
+  }
+  .speaker i{ color:var(--maroon-light); font-size:.7rem; }
+  .speaker b{ color:var(--white); font-weight:600; }
 
   h1.title{
     font-size:clamp(2.2rem, 5vw, 3.6rem);
@@ -147,6 +155,43 @@
   }
   .code-block .kw{ color:var(--maroon-light); }
   .code-block .cm{ color:var(--gray); font-style:italic; }
+
+  /* ---------- Reportes / capturas ---------- */
+  .report-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; width:100%; }
+  .report-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    overflow:hidden; text-align:left; transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .report-card:hover{ transform: translateY(-4px); border-color: var(--maroon); box-shadow: 0 0 0 1px var(--maroon), 0 0 28px var(--maroon-glow); }
+  .report-card .shot{ width:100%; aspect-ratio:16/10; background:var(--surface-2); display:flex; align-items:center; justify-content:center; overflow:hidden; border-bottom:1px solid var(--border); cursor:zoom-in; }
+  .report-card .shot img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .report-card .shot i{ color:var(--gray); font-size:1.6rem; }
+  .report-card .info{ padding:14px 16px; }
+  .report-card .info .num{
+    display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px;
+    border-radius:50%; background:var(--maroon); color:#fff; font-size:.68rem; font-weight:700; margin-right:8px;
+  }
+  .report-card h3{ font-size:.92rem; display:inline; }
+  .report-card p{ color:var(--gray); font-size:.8rem; line-height:1.5; margin-top:6px; }
+
+  /* ---------- Lightbox ---------- */
+  #lightbox{
+    position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:200;
+    display:flex; align-items:center; justify-content:center; padding:40px;
+    opacity:0; visibility:hidden; transition: opacity .3s ease, visibility .3s;
+  }
+  #lightbox.open{ opacity:1; visibility:visible; }
+  #lightbox img{
+    max-width:90vw; max-height:85vh; border-radius:10px; border:1px solid var(--border);
+    box-shadow:0 0 60px var(--maroon-glow);
+  }
+  #lightbox .lb-close{
+    position:absolute; top:24px; right:28px; width:44px; height:44px; border-radius:50%;
+    background:var(--surface); border:1px solid var(--border); color:var(--white);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.1rem;
+    transition: border-color .25s, box-shadow .25s, background .25s;
+  }
+  #lightbox .lb-close:hover{ border-color:var(--maroon); background:var(--maroon); box-shadow:0 0 22px var(--maroon-glow); }
 
   /* ---------- Timeline (fases) ---------- */
   .timeline{ display:flex; width:100%; gap:10px; flex-wrap:wrap; justify-content:center; }
@@ -255,12 +300,12 @@
     <section class="slide active" data-title="Portada">
       <div class="cover-icon"><i class="fa-solid fa-clapperboard"></i></div>
       <div class="eyebrow"><i class="fa-solid fa-graduation-cap"></i> Proyecto Final · Julio 2026</div>
-      <h1 class="title">Base de Datos de<br><span>Servicio de Streaming</span></h1>
-      <p class="subtitle">Diseño relacional de una plataforma de video bajo demanda: catálogo audiovisual jerárquico y consumo transaccional de usuarios, en el contexto ecuatoriano.</p>
+      <h1 class="title">NUVIO<br><span>Base de Datos de Streaming</span></h1>
+      <p class="subtitle">Diseño relacional de NUVIO, una plataforma de video bajo demanda: catálogo audiovisual jerárquico y consumo transaccional de usuarios, en el contexto ecuatoriano.</p>
       <div class="team">
+        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
         <div class="member"><i class="fa-solid fa-user"></i> Jim Alejandro Vargas Bravo</div>
         <div class="member"><i class="fa-solid fa-user"></i> Matías Fernando Yépez Santelices</div>
-        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
       </div>
       <div class="meta-row">
         <span><i class="fa-solid fa-chalkboard-user"></i> Docente: Paul Francisco Baldeón Egas</span>
@@ -268,10 +313,11 @@
       </div>
     </section>
 
-    <!-- 2. IDEA DEL PROYECTO -->
+    <!-- 2. IDEA DEL PROYECTO / NUVIO -->
     <section class="slide" data-title="Idea del proyecto">
       <div class="eyebrow"><i class="fa-solid fa-lightbulb"></i> 01 · Idea del proyecto</div>
-      <h2 class="section-title">Dos naturalezas de datos, un mismo sistema</h2>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
+      <h2 class="section-title">NUVIO: dos naturalezas de datos, un mismo sistema</h2>
       <p class="subtitle">Alcance acotado al contexto ecuatoriano (usuarios, ciudades, provincias) para mantener el modelo manejable sin perder complejidad relacional real.</p>
       <div class="content-wrap">
         <div class="grid cols-2">
@@ -291,7 +337,7 @@
         <div class="card" style="width:100%;">
           <div class="icon"><i class="fa-solid fa-bullseye"></i></div>
           <h3>Caso de uso planteado</h3>
-          <p>Una empresa ecuatoriana licencia contenido audiovisual, lo cataloga en su plataforma y lo ofrece a usuarios registrados mediante planes de suscripción, permitiendo múltiples perfiles por cuenta, seguimiento de progreso de visualización y listas personalizadas.</p>
+          <p>NUVIO, una empresa ecuatoriana, licencia contenido audiovisual, lo cataloga en su plataforma y lo ofrece a usuarios registrados mediante planes de suscripción, permitiendo múltiples perfiles por cuenta, seguimiento de progreso de visualización y listas personalizadas.</p>
         </div>
       </div>
     </section>
@@ -299,6 +345,7 @@
     <!-- 3. BLOQUES DEL MODELO E/R -->
     <section class="slide" data-title="Bloques del modelo">
       <div class="eyebrow"><i class="fa-solid fa-diagram-project"></i> 02 · Modelo Entidad–Relación</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
       <h2 class="section-title">Cuatro bloques funcionales</h2>
       <p class="subtitle">El modelo agrupa las entidades del dominio antes de definir tipos de dato o llaves físicas.</p>
       <div class="content-wrap">
@@ -330,6 +377,7 @@
     <!-- 4. RELACIONES PRINCIPALES -->
     <section class="slide" data-title="Relaciones principales">
       <div class="eyebrow"><i class="fa-solid fa-arrows-left-right"></i> 02 · Modelo Entidad–Relación</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
       <h2 class="section-title">Relaciones principales</h2>
       <p class="subtitle">Cardinalidades y notas clave de cada relación identificada en el conceptual.</p>
       <div class="content-wrap">
@@ -358,6 +406,7 @@
     <!-- 5. DECISIONES EXPLÍCITAS -->
     <section class="slide" data-title="Decisiones explícitas">
       <div class="eyebrow"><i class="fa-solid fa-scale-balanced"></i> 02 · Modelo Entidad–Relación</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
       <h2 class="section-title">Decisiones explícitas del conceptual</h2>
       <div class="content-wrap">
         <div class="grid cols-2">
@@ -378,6 +427,7 @@
     <!-- 6. MODELO FÍSICO -->
     <section class="slide" data-title="Modelo físico">
       <div class="eyebrow"><i class="fa-solid fa-table-cells"></i> 03 · Modelo físico</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Jim Vargas</b></div>
       <h2 class="section-title">Del E/R al esquema relacional</h2>
       <p class="subtitle">Reglas estándar de mapeo aplicadas para traducir el conceptual a tablas.</p>
       <div class="content-wrap">
@@ -395,7 +445,7 @@
           <div class="card">
             <div class="icon"><i class="fa-solid fa-table"></i></div>
             <h3>Relaciones N:M</h3>
-            <p>Materializadas como tablas puente: <span style="color:var(--maroon-light)">pelicula_categoria</span>, <span style="color:var(--maroon-light)">serie_categoria</span>, <span style="color:var(--maroon-light)">reparto_pelicula</span>, <span style="color:var(--maroon-light)">reparto_capitulo</span>.</p>
+            <p>Materializadas como tablas puente nuevas —no existían como entidades en el diagrama original—: <span style="color:var(--maroon-light)">pelicula_categoria</span>, <span style="color:var(--maroon-light)">serie_categoria</span>, <span style="color:var(--maroon-light)">reparto_pelicula</span>, <span style="color:var(--maroon-light)">reparto_capitulo</span>.</p>
           </div>
           <div class="card">
             <div class="icon"><i class="fa-solid fa-code-branch"></i></div>
@@ -419,6 +469,7 @@
     <!-- 7. NORMALIZACIÓN -->
     <section class="slide" data-title="Normalización">
       <div class="eyebrow"><i class="fa-solid fa-check-double"></i> 04 · Normalización</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Jim Vargas</b></div>
       <h2 class="section-title">Cumplimiento de formas normales</h2>
       <div class="content-wrap">
         <table class="rel-table">
@@ -426,14 +477,14 @@
           <tbody>
             <tr><td class="mono">1FN</td><td>Todos los atributos son atómicos; no hay grupos repetitivos ni columnas multivaluadas.</td></tr>
             <tr><td class="mono">2FN</td><td>Llaves surrogate en todas las tablas evitan dependencias parciales. En claves naturales compuestas (temporada, capítulo, reparto_pelicula, reparto_capitulo) los atributos dependen de la combinación completa que forma el UNIQUE.</td></tr>
-            <tr><td class="mono">3FN</td><td>Sin dependencias transitivas: la cadena geográfica no duplica región en ciudad; Persona/User/Actor evita repetir nombre, cédula o email; las tablas puente no agregan atributos derivados.</td></tr>
+            <tr><td class="mono">3FN</td><td>Sin dependencias transitivas: Persona/User/Actor evita repetir nombre, cédula o email — separar estas tablas evita duplicar datos si una misma persona es usuario y actor a la vez.</td></tr>
           </tbody>
         </table>
         <div class="grid cols-2" style="margin-top:4px;">
           <div class="card">
-            <div class="icon"><i class="fa-solid fa-shuffle"></i></div>
-            <h3>Patrón polimórfico</h3>
-            <p>FKs nulleables + CHECK en visualización/mi_lista priorizan simplicidad sobre una tabla supertipo "contenido", a costa de no poder indexar un único campo de referencia.</p>
+            <div class="icon"><i class="fa-solid fa-font"></i></div>
+            <h3>Nomenclatura y auditoría</h3>
+            <p>snake_case consistente (<span style="color:var(--maroon-light)">persona_id</span>, <span style="color:var(--maroon-light)">created_at</span>). Cada tabla de negocio incluye <span style="color:var(--maroon-light)">is_active, created_at, updated_at, created_by, updated_by</span>, permitiendo rastrear autoría sin modelarlo en el conceptual.</p>
           </div>
           <div class="card">
             <div class="icon"><i class="fa-solid fa-bolt"></i></div>
@@ -447,6 +498,7 @@
     <!-- 8. RUPTURA DEPENDENCIA CIRCULAR -->
     <section class="slide" data-title="Dependencia circular">
       <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
       <h2 class="section-title">Ruptura de la dependencia circular</h2>
       <p class="subtitle"><span class="mono" style="color:var(--maroon-light)">persona.created_by</span> referencia <span class="mono" style="color:var(--maroon-light)">user.id</span>, pero <span class="mono" style="color:var(--maroon-light)">user.persona_id</span> referencia <span class="mono" style="color:var(--maroon-light)">persona.id</span>.</p>
       <div class="content-wrap">
@@ -482,6 +534,7 @@
     <!-- 9. CHECK POLIMÓRFICO -->
     <section class="slide" data-title="CHECK polimórfico">
       <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
       <h2 class="section-title">Patrón polimórfico con CHECK</h2>
       <p class="subtitle">Evita una tabla intermedia genérica de tipo "contenido" para referenciar película o capítulo.</p>
       <div class="content-wrap">
@@ -509,9 +562,42 @@
       </div>
     </section>
 
-    <!-- 10. DATOS Y CONSULTAS DE PRUEBA -->
+    <!-- 10. REPORTES / VISTAS -->
+    <section class="slide" data-title="Reportes y vistas">
+      <div class="eyebrow"><i class="fa-solid fa-chart-simple"></i> 06 · Reportes</div>
+      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
+      <h2 class="section-title">Reportes del sistema (vistas)</h2>
+      <p class="subtitle">Cinco vistas construidas sobre el esquema para responder preguntas de negocio recurrentes.</p>
+      <div class="content-wrap">
+        <div class="report-grid">
+          <div class="report-card">
+            <div class="shot" onclick="openLightbox('img/1.png')"><img src="img/1.png" alt="Reporte 1" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
+            <div class="info"><span class="num">1</span><h3>Reporte 1</h3><p>Reporte: Suscripciones activas por usuario y plan.</p></div>
+          </div>
+          <div class="report-card">
+            <div class="shot" onclick="openLightbox('img/2.png')"><img src="img/2.png" alt="Reporte 2" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
+            <div class="info"><span class="num">2</span><h3>Reporte 2</h3><p>Reporte: Catálogo de películas con estudio, productora y categorías.</p></div>
+          </div>
+          <div class="report-card">
+            <div class="shot" onclick="openLightbox('img/3.png')"><img src="img/3.png" alt="Reporte 3" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
+            <div class="info"><span class="num">3</span><h3>Reporte 3</h3><p>Reporte: Historial de visualizaciones por perfil.</p></div>
+          </div>
+          <div class="report-card">
+            <div class="shot" onclick="openLightbox('img/4.png')"><img src="img/4.png" alt="Reporte 4" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
+            <div class="info"><span class="num">4</span><h3>Reporte 4</h3><p>Reporte: Reparto (elenco) por película.</p></div>
+          </div>
+          <div class="report-card">
+            <div class="shot" onclick="openLightbox('img/5.png')"><img src="img/5.png" alt="Reporte 5" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
+            <div class="info"><span class="num">5</span><h3>Reporte 5</h3><p>Reporte: Series con número de temporadas y capítulos.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. DATOS Y CONSULTAS DE PRUEBA -->
     <section class="slide" data-title="Datos y consultas de prueba">
       <div class="eyebrow"><i class="fa-solid fa-flask"></i> 05 · Creación del script</div>
+      <div class="speaker"><i class="fa-solid fa-users"></i> Presenta: <b>Equipo NUVIO</b></div>
       <h2 class="section-title">Datos y consultas de prueba</h2>
       <div class="content-wrap">
         <div class="grid cols-2">
@@ -544,14 +630,19 @@
     <section class="slide" data-title="Cierre">
       <div class="thanks-icon"><i class="fa-solid fa-clapperboard"></i></div>
       <h1 class="title">Gracias por su <span>atención</span></h1>
-      <p class="subtitle">Base de Datos de Servicio de Streaming — UEES, Base de Datos I</p>
+      <p class="subtitle">NUVIO — Base de Datos de Servicio de Streaming — UEES, Base de Datos I</p>
       <div class="team">
+        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
         <div class="member"><i class="fa-solid fa-user"></i> Jim Alejandro Vargas Bravo</div>
         <div class="member"><i class="fa-solid fa-user"></i> Matías Fernando Yépez Santelices</div>
-        <div class="member"><i class="fa-solid fa-user"></i> Oscar Luis Morán Gómez</div>
       </div>
     </section>
 
+  </div>
+
+  <div id="lightbox">
+    <div class="lb-close" id="lbClose"><i class="fa-solid fa-xmark"></i></div>
+    <img id="lbImg" src="" alt="Vista ampliada" />
   </div>
 
   <div id="hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd> para navegar &nbsp;·&nbsp; <kbd>Espacio</kbd> siguiente</div>
@@ -609,11 +700,31 @@
   prevBtn.addEventListener('click', prev);
 
   window.addEventListener('keydown', (e) => {
+    if (lightbox.classList.contains('open')){
+      if (e.key === 'Escape'){ closeLightbox(); }
+      return;
+    }
     if (['ArrowRight','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
     if (['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
     if (e.key === 'Home'){ goTo(0); }
     if (e.key === 'End'){ goTo(total - 1); }
   });
+
+  // ---------- Lightbox ----------
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbClose = document.getElementById('lbClose');
+
+  function openLightbox(src){
+    lbImg.src = src;
+    lightbox.classList.add('open');
+  }
+  function closeLightbox(){
+    lightbox.classList.remove('open');
+    lbImg.src = '';
+  }
+  lbClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
   // Swipe táctil
   let touchStartX = 0;
