@@ -156,6 +156,35 @@
   .code-block .kw{ color:var(--maroon-light); }
   .code-block .cm{ color:var(--gray); font-style:italic; }
 
+  /* ---------- Layout compacto: imagen + lista ---------- */
+  .split{ display:flex; gap:32px; align-items:center; width:100%; }
+  .split .split-img{
+    flex:1; border-radius:14px; overflow:hidden; border:1px solid var(--border);
+    background:var(--surface); cursor:zoom-in; transition: border-color .3s, box-shadow .3s;
+  }
+  .split .split-img:hover{ border-color:var(--maroon); box-shadow:0 0 28px var(--maroon-glow); }
+  .split .split-img img{ width:100%; display:block; }
+  .split .split-text{ flex:1; }
+
+  .quick-list{ list-style:none; width:100%; }
+  .quick-list li{
+    display:flex; align-items:flex-start; gap:12px; padding:12px 0;
+    border-bottom:1px solid var(--border); font-size:.95rem;
+  }
+  .quick-list li:last-child{ border-bottom:none; }
+  .quick-list li i{ color:var(--maroon-light); font-size:.95rem; margin-top:3px; width:18px; text-align:center; }
+  .quick-list li b{ color:var(--white); }
+  .quick-list li span{ color:var(--gray); }
+
+  .highlight-box{
+    width:100%; border:1px solid var(--maroon); border-radius:12px; padding:16px 18px;
+    background:var(--surface); display:flex; align-items:flex-start; gap:12px;
+    box-shadow:0 0 24px var(--maroon-glow);
+  }
+  .highlight-box i{ color:var(--maroon-light); font-size:1.1rem; margin-top:2px; }
+  .highlight-box p{ color:var(--white); font-size:.92rem; line-height:1.5; }
+  .highlight-box p b{ color:var(--maroon-light); }
+
   /* ---------- Reportes / capturas ---------- */
   .report-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; width:100%; }
   .report-card{
@@ -313,315 +342,145 @@
       </div>
     </section>
 
-    <!-- 2. IDEA DEL PROYECTO / NUVIO -->
-    <section class="slide" data-title="Idea del proyecto">
-      <div class="eyebrow"><i class="fa-solid fa-lightbulb"></i> 01 · Idea del proyecto</div>
+    <!-- 2. NUVIO -->
+    <section class="slide" data-title="NUVIO">
+      <div class="eyebrow"><i class="fa-solid fa-lightbulb"></i> 01 · El qué</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
-      <h2 class="section-title">NUVIO: dos naturalezas de datos, un mismo sistema</h2>
-      <p class="subtitle">Alcance acotado al contexto ecuatoriano (usuarios, ciudades, provincias) para mantener el modelo manejable sin perder complejidad relacional real.</p>
+      <h2 class="section-title">NUVIO: streaming ecuatoriano</h2>
       <div class="content-wrap">
-        <div class="grid cols-2">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-film"></i></div>
-            <span class="tag">Catálogo</span>
-            <h3>Información de catálogo</h3>
-            <p>Películas, series, temporadas, capítulos y reparto — del tipo que normalmente se extrae de fuentes externas (APIs de cine, bases públicas audiovisuales).</p>
+        <div class="split">
+          <div class="split-img" onclick="openLightbox('img/diagrama_er.png')">
+            <img src="img/diagrama_er.png" alt="Diagrama E/R" onerror="this.parentElement.innerHTML='<div style=&quot;padding:60px;text-align:center;color:var(--gray)&quot;><i class=&quot;fa-solid fa-diagram-project fa-2x&quot;></i></div>'">
           </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-credit-card"></i></div>
-            <span class="tag">Transaccional</span>
-            <h3>Información transaccional</h3>
-            <p>Usuarios, perfiles, suscripciones e historial de visualización — propia de la operación diaria de un sistema de streaming.</p>
+          <div class="split-text">
+            <ul class="quick-list">
+              <li><i class="fa-solid fa-bullseye"></i><span><b>Qué hace:</b> licencia y cataloga contenido audiovisual, lo ofrece por suscripción.</span></li>
+              <li><i class="fa-solid fa-earth-americas"></i><span><b>Alcance:</b> usuarios, ciudades y provincias de Ecuador.</span></li>
+              <li><i class="fa-solid fa-diagram-project"></i><span><b>Modelo:</b> diagrama E/R conceptual completo.</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="card" style="width:100%;">
-          <div class="icon"><i class="fa-solid fa-bullseye"></i></div>
-          <h3>Caso de uso planteado</h3>
-          <p>NUVIO, una empresa ecuatoriana, licencia contenido audiovisual, lo cataloga en su plataforma y lo ofrece a usuarios registrados mediante planes de suscripción, permitiendo múltiples perfiles por cuenta, seguimiento de progreso de visualización y listas personalizadas.</p>
         </div>
       </div>
     </section>
 
     <!-- 3. BLOQUES DEL MODELO E/R -->
     <section class="slide" data-title="Bloques del modelo">
-      <div class="eyebrow"><i class="fa-solid fa-diagram-project"></i> 02 · Modelo Entidad–Relación</div>
+      <div class="eyebrow"><i class="fa-solid fa-diagram-project"></i> 01 · El qué</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
-      <h2 class="section-title">Cuatro bloques funcionales</h2>
-      <p class="subtitle">El modelo agrupa las entidades del dominio antes de definir tipos de dato o llaves físicas.</p>
+      <h2 class="section-title">Cuatro bloques del MER</h2>
       <div class="content-wrap">
-        <div class="grid cols-4">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-earth-americas"></i></div>
-            <h3>Geografía</h3>
-            <p>Región → Provincia → Ciudad, cadena jerárquica 1:N usada como ubicación de Persona.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-id-card"></i></div>
-            <h3>Identidad</h3>
-            <p>Persona como entidad base; User y Actor como especializaciones 1:1. User posee Perfil (1:N).</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-layer-group"></i></div>
-            <h3>Catálogo</h3>
-            <p>Estudio y Productora producen Película/Serie. Categoría clasifica (N:M). Serie → Temporada → Capítulo.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-receipt"></i></div>
-            <h3>Consumo y negocio</h3>
-            <p>User contrata Plan (Suscripción). Perfil visualiza contenido y guarda en MiLista.</p>
-          </div>
+        <ul class="quick-list">
+          <li><i class="fa-solid fa-earth-americas"></i><span><b>Geografía:</b> Región → Provincia → Ciudad.</span></li>
+          <li><i class="fa-solid fa-id-card"></i><span><b>Identidad:</b> Persona es la base; User y Actor son especializaciones 1:1.</span></li>
+          <li><i class="fa-solid fa-layer-group"></i><span><b>Catálogo:</b> Estudio/Productora producen Película/Serie; Categoría clasifica N:M.</span></li>
+          <li><i class="fa-solid fa-receipt"></i><span><b>Consumo:</b> User contrata Plan; Perfil visualiza y guarda listas.</span></li>
+        </ul>
+        <div class="highlight-box">
+          <i class="fa-solid fa-scale-balanced"></i>
+          <p><b>Decisión clave:</b> Empresa y Logs quedan fuera de las relaciones de negocio — son entidades administrativas (institucional / auditoría transversal), no operativas.</p>
         </div>
       </div>
     </section>
 
-    <!-- 4. RELACIONES PRINCIPALES -->
-    <section class="slide" data-title="Relaciones principales">
-      <div class="eyebrow"><i class="fa-solid fa-arrows-left-right"></i> 02 · Modelo Entidad–Relación</div>
-      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
-      <h2 class="section-title">Relaciones principales</h2>
-      <p class="subtitle">Cardinalidades y notas clave de cada relación identificada en el conceptual.</p>
-      <div class="content-wrap">
-        <table class="rel-table">
-          <thead><tr><th>Relación</th><th>Entidades</th><th>Cardin.</th><th>Nota</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">pertenece_a</td><td>Provincia → Región</td><td>N:1</td><td class="muted">—</td></tr>
-            <tr><td class="mono">pertenece_a</td><td>Ciudad → Provincia</td><td>N:1</td><td class="muted">—</td></tr>
-            <tr><td class="mono">reside_en</td><td>Persona → Ciudad</td><td>N:1</td><td class="muted">—</td></tr>
-            <tr><td class="mono">es_un</td><td>User → Persona</td><td>1:1</td><td class="muted">especialización</td></tr>
-            <tr><td class="mono">es_un</td><td>Actor → Persona</td><td>1:1</td><td class="muted">especialización</td></tr>
-            <tr><td class="mono">posee</td><td>User → Perfil</td><td>1:N</td><td class="muted">—</td></tr>
-            <tr><td class="mono">produce</td><td>Estudio → Película / Serie</td><td>1:N</td><td class="muted">—</td></tr>
-            <tr><td class="mono">produce</td><td>Productora → Película / Capítulo</td><td>1:N</td><td class="muted">—</td></tr>
-            <tr><td class="mono">clasifica</td><td>Categoría ↔ Película / Serie</td><td>N:M</td><td class="muted">—</td></tr>
-            <tr><td class="mono">compuesta_por</td><td>Serie → Temporada → Capítulo</td><td>1:N</td><td class="muted">cadena</td></tr>
-            <tr><td class="mono">participa_en</td><td>Actor ↔ Película / Capítulo</td><td>N:M</td><td class="muted">atributo rol</td></tr>
-            <tr><td class="mono">contrata</td><td>User ↔ Plan</td><td>N:M</td><td class="muted">entidad Suscripción</td></tr>
-            <tr><td class="mono">visualiza</td><td>Perfil ↔ Película / Capítulo</td><td>N:M</td><td class="muted">entidad Visualización</td></tr>
-            <tr><td class="mono">guarda</td><td>Perfil ↔ Película / Serie</td><td>N:M</td><td class="muted">entidad MiLista</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 5. DECISIONES EXPLÍCITAS -->
-    <section class="slide" data-title="Decisiones explícitas">
-      <div class="eyebrow"><i class="fa-solid fa-scale-balanced"></i> 02 · Modelo Entidad–Relación</div>
-      <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Oscar Morán</b></div>
-      <h2 class="section-title">Decisiones explícitas del conceptual</h2>
-      <div class="content-wrap">
-        <div class="grid cols-2">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-building"></i></div>
-            <h3>Empresa y Logs</h3>
-            <p>Se dejaron como entidades administrativas sin relación de negocio directa: Empresa es información institucional y Logs es auditoría transversal a todo el sistema.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <h3>Campos de auditoría</h3>
-            <p>Usuario y fecha de creación/modificación no se modelan como entidad ni relación en el E/R conceptual — pertenecen al diseño físico, no al conceptual.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. MODELO FÍSICO -->
+    <!-- 4. MODELO FÍSICO -->
     <section class="slide" data-title="Modelo físico">
-      <div class="eyebrow"><i class="fa-solid fa-table-cells"></i> 03 · Modelo físico</div>
+      <div class="eyebrow"><i class="fa-solid fa-table-cells"></i> 02 · El cómo</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Jim Vargas</b></div>
       <h2 class="section-title">Del E/R al esquema relacional</h2>
-      <p class="subtitle">Reglas estándar de mapeo aplicadas para traducir el conceptual a tablas.</p>
       <div class="content-wrap">
-        <div class="grid cols-2">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-key"></i></div>
-            <h3>Llaves surrogate</h3>
-            <p>Toda entidad se convirtió en tabla con <span class="mono" style="color:var(--maroon-light)">id SERIAL</span>, en lugar de identificadores conceptuales, simplificando FKs y evitando colisiones de nombre.</p>
+        <div class="split">
+          <div class="split-img" onclick="openLightbox('img/diagrama_fisico.png')">
+            <img src="img/diagrama_fisico.png" alt="Diagrama físico" onerror="this.parentElement.innerHTML='<div style=&quot;padding:60px;text-align:center;color:var(--gray)&quot;><i class=&quot;fa-solid fa-table-cells fa-2x&quot;></i></div>'">
           </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-link"></i></div>
-            <h3>Relaciones 1:N</h3>
-            <p>Resueltas con FK en la tabla del lado N. Ej: <span style="color:var(--maroon-light)">provincia.region_id</span>, <span style="color:var(--maroon-light)">pelicula.estudio_id</span>.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-table"></i></div>
-            <h3>Relaciones N:M</h3>
-            <p>Materializadas como tablas puente nuevas —no existían como entidades en el diagrama original—: <span style="color:var(--maroon-light)">pelicula_categoria</span>, <span style="color:var(--maroon-light)">serie_categoria</span>, <span style="color:var(--maroon-light)">reparto_pelicula</span>, <span style="color:var(--maroon-light)">reparto_capitulo</span>.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-code-branch"></i></div>
-            <h3>Entidades asociativas</h3>
-            <p>Suscripción, Visualización y MiLista ya tenían atributos propios en el E/R — se mapearon directo como tabla, sin puente adicional.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-code-fork"></i></div>
-            <h3>Especialización 1:1</h3>
-            <p>User y Actor como subtipos de Persona se resolvieron con FK única (<span style="color:var(--maroon-light)">persona_id UNIQUE</span>) en lugar de fusionar atributos.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-clipboard-check"></i></div>
-            <h3>Bloque de auditoría</h3>
-            <p>Cada tabla de negocio suma <span style="color:var(--maroon-light)">is_active, created_at, updated_at, created_by, updated_by</span> (FK a user.id).</p>
+          <div class="split-text">
+            <ul class="quick-list">
+              <li><i class="fa-solid fa-key"></i><span>Toda entidad → tabla con <b>id SERIAL</b> (surrogate key).</span></li>
+              <li><i class="fa-solid fa-link"></i><span><b>1:N</b> → FK en la tabla del lado "muchos" (ej. pelicula.estudio_id).</span></li>
+              <li><i class="fa-solid fa-table"></i><span><b>N:M</b> → tabla puente nueva (pelicula_categoria, reparto_pelicula).</span></li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 7. NORMALIZACIÓN -->
+    <!-- 5. NORMALIZACIÓN -->
     <section class="slide" data-title="Normalización">
-      <div class="eyebrow"><i class="fa-solid fa-check-double"></i> 04 · Normalización</div>
+      <div class="eyebrow"><i class="fa-solid fa-check-double"></i> 02 · El cómo</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Jim Vargas</b></div>
-      <h2 class="section-title">Cumplimiento de formas normales</h2>
+      <h2 class="section-title">Normalización y nomenclatura</h2>
       <div class="content-wrap">
-        <table class="rel-table">
-          <thead><tr><th>Forma</th><th>Verificación</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">1FN</td><td>Todos los atributos son atómicos; no hay grupos repetitivos ni columnas multivaluadas.</td></tr>
-            <tr><td class="mono">2FN</td><td>Llaves surrogate en todas las tablas evitan dependencias parciales. En claves naturales compuestas (temporada, capítulo, reparto_pelicula, reparto_capitulo) los atributos dependen de la combinación completa que forma el UNIQUE.</td></tr>
-            <tr><td class="mono">3FN</td><td>Sin dependencias transitivas: Persona/User/Actor evita repetir nombre, cédula o email — separar estas tablas evita duplicar datos si una misma persona es usuario y actor a la vez.</td></tr>
-          </tbody>
-        </table>
-        <div class="grid cols-2" style="margin-top:4px;">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-font"></i></div>
-            <h3>Nomenclatura y auditoría</h3>
-            <p>snake_case consistente (<span style="color:var(--maroon-light)">persona_id</span>, <span style="color:var(--maroon-light)">created_at</span>). Cada tabla de negocio incluye <span style="color:var(--maroon-light)">is_active, created_at, updated_at, created_by, updated_by</span>, permitiendo rastrear autoría sin modelarlo en el conceptual.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-bolt"></i></div>
-            <h3>Dato derivable almacenado</h3>
-            <p><span style="color:var(--maroon-light)">suscripcion.estado</span> es derivable de fecha_vencimiento; se guarda por performance, asumiendo sincronización externa.</p>
-          </div>
-        </div>
+        <ul class="quick-list">
+          <li><i class="fa-solid fa-1"></i><span><b>1FN:</b> atributos atómicos, sin grupos repetitivos.</span></li>
+          <li><i class="fa-solid fa-2"></i><span><b>2FN:</b> surrogate keys evitan dependencias parciales.</span></li>
+          <li><i class="fa-solid fa-3"></i><span><b>3FN:</b> sin dependencias transitivas — separar Persona/User/Actor evita duplicar cédula y correo si una persona es ambas cosas.</span></li>
+          <li><i class="fa-solid fa-font"></i><span><b>Nomenclatura:</b> snake_case + bloque de auditoría estándar (is_active, created_at, updated_at, created_by, updated_by) en cada tabla.</span></li>
+        </ul>
       </div>
     </section>
 
-    <!-- 8. RUPTURA DEPENDENCIA CIRCULAR -->
+    <!-- 6. RUPTURA DEPENDENCIA CIRCULAR -->
     <section class="slide" data-title="Dependencia circular">
-      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 03 · El script</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
-      <h2 class="section-title">Ruptura de la dependencia circular</h2>
-      <p class="subtitle"><span class="mono" style="color:var(--maroon-light)">persona.created_by</span> referencia <span class="mono" style="color:var(--maroon-light)">user.id</span>, pero <span class="mono" style="color:var(--maroon-light)">user.persona_id</span> referencia <span class="mono" style="color:var(--maroon-light)">persona.id</span>.</p>
+      <h2 class="section-title">Reto: dependencia circular</h2>
+      <p class="subtitle"><span class="mono" style="color:var(--maroon-light)">persona.created_by</span> → user.id, pero <span class="mono" style="color:var(--maroon-light)">user.persona_id</span> → persona.id.</p>
       <div class="content-wrap">
         <div class="code-block">
           <div class="code-head"><i class="fa-solid fa-file-code"></i> ddl_persona_user.sql</div>
-          <pre><span class="kw">CREATE TABLE</span> persona (
-  id SERIAL <span class="kw">PRIMARY KEY</span>,
-  nombres VARCHAR(100) <span class="kw">NOT NULL</span>,
-  ...
-  created_by INT,
-  updated_by INT
-);
-
-<span class="kw">CREATE TABLE</span> "user" (
-  id SERIAL <span class="kw">PRIMARY KEY</span>,
-  persona_id INT <span class="kw">NOT NULL UNIQUE REFERENCES</span> persona(id),
-  username VARCHAR(50) <span class="kw">NOT NULL UNIQUE</span>,
-  password VARCHAR(255) <span class="kw">NOT NULL</span>,
-  ...
-  created_by INT <span class="kw">REFERENCES</span> "user"(id),
-  updated_by INT <span class="kw">REFERENCES</span> "user"(id)
-);
-
-<span class="cm">-- Se cierran las FKs de auditoría diferidas en persona</span>
+          <pre><span class="cm">-- 1. persona sin FK de auditoría · 2. user · 3. cerrar el ciclo:</span>
 <span class="kw">ALTER TABLE</span> persona <span class="kw">ADD CONSTRAINT</span> fk_persona_created_by
-  <span class="kw">FOREIGN KEY</span> (created_by) <span class="kw">REFERENCES</span> "user"(id);
-<span class="kw">ALTER TABLE</span> persona <span class="kw">ADD CONSTRAINT</span> fk_persona_updated_by
-  <span class="kw">FOREIGN KEY</span> (updated_by) <span class="kw">REFERENCES</span> "user"(id);</pre>
+  <span class="kw">FOREIGN KEY</span> (created_by) <span class="kw">REFERENCES</span> "user"(id);</pre>
         </div>
       </div>
     </section>
 
-    <!-- 9. CHECK POLIMÓRFICO -->
+    <!-- 7. CHECK POLIMÓRFICO -->
     <section class="slide" data-title="CHECK polimórfico">
-      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 05 · Creación del script</div>
+      <div class="eyebrow"><i class="fa-solid fa-terminal"></i> 03 · El script</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
-      <h2 class="section-title">Patrón polimórfico con CHECK</h2>
-      <p class="subtitle">Evita una tabla intermedia genérica de tipo "contenido" para referenciar película o capítulo.</p>
+      <h2 class="section-title">Reto: patrón polimórfico</h2>
+      <p class="subtitle">Sin tabla genérica "contenido" para referenciar película o capítulo.</p>
       <div class="content-wrap">
         <div class="code-block">
           <div class="code-head"><i class="fa-solid fa-file-code"></i> ddl_visualizacion.sql</div>
           <pre><span class="kw">CREATE TABLE</span> visualizacion (
-  id SERIAL <span class="kw">PRIMARY KEY</span>,
-  perfil_id INT <span class="kw">NOT NULL REFERENCES</span> perfil(id),
+  ...
   pelicula_id INT <span class="kw">REFERENCES</span> pelicula(id),
   capitulo_id INT <span class="kw">REFERENCES</span> capitulo(id),
-  progreso DECIMAL(5,2),
-  ...
   <span class="kw">CHECK</span> (pelicula_id <span class="kw">IS NOT NULL OR</span> capitulo_id <span class="kw">IS NOT NULL</span>)
 );</pre>
         </div>
-        <div class="timeline">
-          <div class="step"><div class="num">1</div><p>Geografía</p></div>
-          <div class="step"><div class="num">2</div><p>Identidad</p></div>
-          <div class="step"><div class="num">3</div><p>Catálogo</p></div>
-          <div class="step"><div class="num">4</div><p>Negocio</p></div>
-          <div class="step"><div class="num">5</div><p>Consumo</p></div>
-          <div class="step"><div class="num">6</div><p>Logs</p></div>
-        </div>
-        <p class="subtitle" style="margin-top:4px;">Orden de creación por dependencia, con índices sobre FKs de mayor uso esperado en joins, todo dentro de una transacción BEGIN/COMMIT.</p>
       </div>
     </section>
 
-    <!-- 10. REPORTES / VISTAS -->
+    <!-- 8. REPORTES / VISTAS -->
     <section class="slide" data-title="Reportes y vistas">
-      <div class="eyebrow"><i class="fa-solid fa-chart-simple"></i> 06 · Reportes</div>
+      <div class="eyebrow"><i class="fa-solid fa-chart-simple"></i> 04 · Resultados</div>
       <div class="speaker"><i class="fa-solid fa-user"></i> Presenta: <b>Matías Yépez</b></div>
       <h2 class="section-title">Reportes del sistema (vistas)</h2>
-      <p class="subtitle">Cinco vistas construidas sobre el esquema para responder preguntas de negocio recurrentes.</p>
+      <p class="subtitle">La base de datos funciona: vistas construidas para preguntas de negocio reales.</p>
       <div class="content-wrap">
         <div class="report-grid">
           <div class="report-card">
             <div class="shot" onclick="openLightbox('img/1.png')"><img src="img/1.png" alt="Reporte 1" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
-            <div class="info"><span class="num">1</span><h3>Reporte 1</h3><p>Reporte: Suscripciones activas por usuario y plan.</p></div>
+            <div class="info"><span class="num">1</span><h3>Reporte 1</h3><p>Descripción pendiente.</p></div>
           </div>
           <div class="report-card">
             <div class="shot" onclick="openLightbox('img/2.png')"><img src="img/2.png" alt="Reporte 2" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
-            <div class="info"><span class="num">2</span><h3>Reporte 2</h3><p>Reporte: Catálogo de películas con estudio, productora y categorías.</p></div>
+            <div class="info"><span class="num">2</span><h3>Reporte 2</h3><p>Descripción pendiente.</p></div>
           </div>
           <div class="report-card">
             <div class="shot" onclick="openLightbox('img/3.png')"><img src="img/3.png" alt="Reporte 3" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
-            <div class="info"><span class="num">3</span><h3>Reporte 3</h3><p>Reporte: Historial de visualizaciones por perfil.</p></div>
+            <div class="info"><span class="num">3</span><h3>Reporte 3</h3><p>Descripción pendiente.</p></div>
           </div>
           <div class="report-card">
             <div class="shot" onclick="openLightbox('img/4.png')"><img src="img/4.png" alt="Reporte 4" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
-            <div class="info"><span class="num">4</span><h3>Reporte 4</h3><p>Reporte: Reparto (elenco) por película.</p></div>
+            <div class="info"><span class="num">4</span><h3>Reporte 4</h3><p>Descripción pendiente.</p></div>
           </div>
           <div class="report-card">
             <div class="shot" onclick="openLightbox('img/5.png')"><img src="img/5.png" alt="Reporte 5" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-image\'></i>'"></div>
-            <div class="info"><span class="num">5</span><h3>Reporte 5</h3><p>Reporte: Series con número de temporadas y capítulos.</p></div>
+            <div class="info"><span class="num">5</span><h3>Reporte 5</h3><p>Descripción pendiente.</p></div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 11. DATOS Y CONSULTAS DE PRUEBA -->
-    <section class="slide" data-title="Datos y consultas de prueba">
-      <div class="eyebrow"><i class="fa-solid fa-flask"></i> 05 · Creación del script</div>
-      <div class="speaker"><i class="fa-solid fa-users"></i> Presenta: <b>Equipo NUVIO</b></div>
-      <h2 class="section-title">Datos y consultas de prueba</h2>
-      <div class="content-wrap">
-        <div class="grid cols-2">
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-seedling"></i></div>
-            <h3>Seed de datos</h3>
-            <p>Geografía ecuatoriana, usuarios y perfiles, actores y contenido (películas y series con temporadas/capítulos), reparto, planes y suscripciones —incluyendo un caso vencido—, visualizaciones y listas.</p>
-          </div>
-          <div class="card">
-            <div class="icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
-            <h3>12 consultas de prueba</h3>
-            <p>Ejercitan joins multi-tabla, agregaciones, top-N y el patrón COALESCE necesario para las tablas polimórficas.</p>
-          </div>
-        </div>
-        <div class="code-block">
-          <div class="code-head"><i class="fa-solid fa-file-code"></i> contenido_mas_visto.sql</div>
-          <pre><span class="kw">SELECT</span> COALESCE(p.titulo, cap.titulo) <span class="kw">AS</span> contenido,
-       COUNT(*) <span class="kw">AS</span> veces_visto,
-       ROUND(AVG(v.progreso), 2) <span class="kw">AS</span> progreso_promedio
-<span class="kw">FROM</span> visualizacion v
-<span class="kw">LEFT JOIN</span> pelicula p   <span class="kw">ON</span> p.id = v.pelicula_id
-<span class="kw">LEFT JOIN</span> capitulo cap <span class="kw">ON</span> cap.id = v.capitulo_id
-<span class="kw">GROUP BY</span> COALESCE(p.titulo, cap.titulo)
-<span class="kw">ORDER BY</span> veces_visto <span class="kw">DESC</span>;</pre>
         </div>
       </div>
     </section>
